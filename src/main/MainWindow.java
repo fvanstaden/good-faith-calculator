@@ -9,6 +9,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.JavaBean;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBoxMenuItem;
@@ -34,7 +36,7 @@ public class MainWindow extends JFrame {
 
 		EventQueue.invokeLater(new Runnable() {
 			@Override
-			public void run() {
+			public void run() { 
 
 				try {
 					MainWindow frame = new MainWindow();
@@ -54,11 +56,11 @@ public class MainWindow extends JFrame {
 		
 		controller = new Controller();
 		
-		setTitle("Good Faith Calculator");
+		setTitle("Estimator (Java Version: " + System.getProperty("java.version") + ") ");
 
 		setResizable(false);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setBounds(100, 100, 841, 771);
+		setBounds(100, 100, 841, 812);
 
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBackground(SystemColor.menu);

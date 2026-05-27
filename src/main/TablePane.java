@@ -39,6 +39,7 @@ import com.spire.doc.Column;
 import net.miginfocom.swing.MigLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.DefaultComboBoxModel;
 
 
 public class TablePane extends JPanel{
@@ -213,6 +214,35 @@ public class TablePane extends JPanel{
 		JLabel lblNewLabel_1_1_2_1 = new JLabel("Deductible:");
 		lblNewLabel_1_1_2_1.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewLabel_1_1_2_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		
+		JButton btnNewButton_1_1_1_1 = new JButton("Toggle Deduc.");
+		btnNewButton_1_1_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnNewButton_1_1_1_1.setToolTipText("Toggles the 'Affects Deduc.' for all rows.");
+		
+		
+		btnNewButton_1_1_1_1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				
+
+				for(int i = 0; i < tableMain.getRowCount(); i++) {
+					
+					Boolean cuurentValueBoolean = (Boolean) tableMain.getValueAt(i, 2);
+					
+					
+					tableMain.setValueAt(!(cuurentValueBoolean), i, 2);
+				
+					
+				}
+				calculateTotal();
+				
+			}
+		});
+		
+		btnNewButton_1_1_1_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		GroupLayout gl_deducPanel = new GroupLayout(deducPanel);
 		gl_deducPanel.setHorizontalGroup(
 			gl_deducPanel.createParallelGroup(Alignment.LEADING)
@@ -221,15 +251,18 @@ public class TablePane extends JPanel{
 					.addComponent(lblNewLabel_1_1_2_1, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(deductibleTextField, GroupLayout.PREFERRED_SIZE, 214, GroupLayout.PREFERRED_SIZE)
-					.addGap(474))
+					.addGap(485)
+					.addComponent(btnNewButton_1_1_1_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
 		);
 		gl_deducPanel.setVerticalGroup(
 			gl_deducPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_deducPanel.createSequentialGroup()
 					.addGroup(gl_deducPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel_1_1_2_1, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)
-						.addComponent(deductibleTextField, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(11, Short.MAX_VALUE))
+						.addComponent(deductibleTextField, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnNewButton_1_1_1_1))
+					.addContainerGap(10, Short.MAX_VALUE))
 		);
 		deducPanel.setLayout(gl_deducPanel);
 		panel.setLayout(new GridLayout(0, 1, 0, 0));
@@ -239,96 +272,12 @@ public class TablePane extends JPanel{
 		lblNewLabel_1_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
 		insuranceCBX = new JComboBox();
-		insuranceCBX.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				
-				if(insuranceCBX.getSelectedItem() != "") {
-
-					codeCBX.setEnabled(true);
-					favoritesCBX.setEnabled(true);
-
-					codeCBX.removeAllItems();
-					favoritesCBX.removeAllItems();
-					
-					if(controller.codeDescriptions == null) {return;}
-
-					for (String s : controller.codeDescriptions.keySet()) {
-						if(insuranceCBX.getSelectedItem() != null) {
-							String cost = controller.codes.get(s.split(" \\| ")[0]).get(insuranceCBX.getSelectedItem().toString()).get(1).toString().trim();
-							if((cost == "" || cost == "0" || cost == null) && controller.hideCodesSetting){
-
-								//codeCBX.addItem(s);
-
-							}else {
-								codeCBX.addItem(s + " | " + controller.codeDescriptions.get(s));
-
-							}
-						}
-					}
-
-					codeCount.setText("(" + codeCBX.getItemCount() + ")");
-
-					for (String s : controller.favoriteCodeDescriptions.keySet()) {
-						if(insuranceCBX.getSelectedItem() != null) {
-							String cost = controller.codes.get(s.split(" \\| ")[0]).get(insuranceCBX.getSelectedItem().toString()).get(1).toString().trim();
-							if((cost == "" || cost == "0" || cost == null) && controller.hideCodesSetting){
-
-								//favoritesCBX.addItem(s);
-
-							}else {
-								favoritesCBX.addItem(s + " | " + controller.favoriteCodeDescriptions.get(s));
-
-							}
-						}
-					}
-
-					favoritesCount.setText("(" + favoritesCBX.getItemCount() + ")");
-
-				}else {
-					codeCBX.setEnabled(false);
-					favoritesCBX.setEnabled(false);
-				}
-				
-				if(tableMain != null) {
-					
-					if(insuranceCBX.getSelectedItem() != null && insuranceCBX.getSelectedItem().toString().indexOf("(Attorney)") != -1) {
-						
-						deductibleTextField.setEnabled(false);
-						deductibleTextField.setText("");
-						
-						tableMain.getColumnModel().getColumn(2).setMaxWidth(0);
-						tableMain.getColumnModel().getColumn(3).setMaxWidth(0);
-						tableMain.getColumnModel().getColumn(5).setMaxWidth(0);
-						tableMain.getColumnModel().getColumn(6).setMaxWidth(0);
-						tableMain.getColumnModel().getColumn(4).setHeaderValue("(%) Discount Amount");
-						
-					}else {
-						
-						deductibleTextField.setEnabled(true);
-						
-						tableMain.getColumnModel().getColumn(2).setMaxWidth(2147483647);
-						tableMain.getColumnModel().getColumn(2).setPreferredWidth(columnWidths.get(3));
-						
-						tableMain.getColumnModel().getColumn(3).setMaxWidth(2147483647);
-						tableMain.getColumnModel().getColumn(3).setPreferredWidth(columnWidths.get(3));
-						
-						tableMain.getColumnModel().getColumn(5).setMaxWidth(2147483647);
-						tableMain.getColumnModel().getColumn(5).setPreferredWidth(columnWidths.get(5));
-						
-						tableMain.getColumnModel().getColumn(6).setMaxWidth(2147483647);
-						tableMain.getColumnModel().getColumn(6).setPreferredWidth(columnWidths.get(6));
-						
-						tableMain.getColumnModel().getColumn(4).setHeaderValue("(%) Co-Insurance");
-						
-					}
-					
-					calculateTotal();
-				}
-				
-				
-			}
+		
+		insuranceCBX.addItemListener(evt -> {
+			insuranceCarrierChangedEvent();
 		});
+
+
 		insuranceCBX.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		insuranceCBX.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		insuranceCBX.setName("");
@@ -368,8 +317,8 @@ public class TablePane extends JPanel{
 		deducPanel2.setFocusable(false);
 		panel.add(deducPanel2);
 
-		displayDeductibleTextField = new JLabel("Deductible: $");
-		displayDeductibleTextField.setForeground(SystemColor.textText);
+		displayDeductibleTextField = new JLabel("Deductible: $ 0.00");
+		displayDeductibleTextField.setForeground(Color.RED);
 		displayDeductibleTextField.setHorizontalAlignment(SwingConstants.LEFT);
 		displayDeductibleTextField.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
@@ -435,7 +384,7 @@ public class TablePane extends JPanel{
 				.addGroup(gl_deducPanel2.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(displayDeductibleTextField, GroupLayout.PREFERRED_SIZE, 319, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, 184, Short.MAX_VALUE)
 					.addComponent(btnNewButton_1_1_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnNewButton_1_1, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
@@ -451,7 +400,7 @@ public class TablePane extends JPanel{
 						.addComponent(btnNewButton_1)
 						.addComponent(btnNewButton_1_1)
 						.addComponent(btnNewButton_1_1_1))
-					.addContainerGap(13, Short.MAX_VALUE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		deducPanel2.setLayout(gl_deducPanel2);
 
@@ -706,6 +655,102 @@ public class TablePane extends JPanel{
         totalLabel.setText("Patient Pays: $" + String.format("%.2f", finalTotal));
 
     }
+	
+	private void insuranceCarrierChangedEvent() 
+	{
+		if(insuranceCBX.getSelectedItem() == null) {
+			return;
+		}
+		else {
+			
+			codeCBX.setEnabled(true);
+			favoritesCBX.setEnabled(true);
+
+			codeCBX.removeAllItems();
+			favoritesCBX.removeAllItems();
+			
+			if(!insuranceCBX.getSelectedItem().toString().trim().equals("")) {
+
+				if(controller.codeDescriptions == null) {return;}
+
+				for (String s : controller.codeDescriptions.keySet()) {
+					
+					String cost = controller.codes.get(s.split(" \\| ")[0]).get(insuranceCBX.getSelectedItem().toString()).get(1).toString().trim();
+					
+					if((cost == "" || cost == "0" || cost == null) && controller.hideCodesSetting){
+
+						//codeCBX.addItem(s);
+
+					}else {
+						codeCBX.addItem(s + " | " + controller.codeDescriptions.get(s));
+		
+					}
+				}
+
+				codeCount.setText("(" + codeCBX.getItemCount() + ")");
+
+				for (String s : controller.favoriteCodeDescriptions.keySet()) {
+					if(insuranceCBX.getSelectedItem() != null) {
+						String cost = controller.codes.get(s.split(" \\| ")[0]).get(insuranceCBX.getSelectedItem().toString()).get(1).toString().trim();
+						if((cost == "" || cost == "0" || cost == null) && controller.hideCodesSetting){
+
+							//favoritesCBX.addItem(s);
+
+						}else {
+							favoritesCBX.addItem(s + " | " + controller.favoriteCodeDescriptions.get(s));
+
+						}
+					}
+				}
+
+				favoritesCount.setText("(" + favoritesCBX.getItemCount() + ")");
+
+			}else {
+				codeCount.setText("(0)");
+				favoritesCount.setText("(0)");
+				codeCBX.setEnabled(false);
+				favoritesCBX.setEnabled(false);
+			}
+		}
+		
+		
+		if(tableMain != null) {
+			
+			if(insuranceCBX.getSelectedItem() != null && insuranceCBX.getSelectedItem().toString().indexOf("(Attorney)") != -1) {
+				
+				deductibleTextField.setEnabled(false);
+				deductibleTextField.setText("");
+				
+				tableMain.getColumnModel().getColumn(2).setMaxWidth(0);
+				tableMain.getColumnModel().getColumn(3).setMaxWidth(0);
+				tableMain.getColumnModel().getColumn(5).setMaxWidth(0);
+				tableMain.getColumnModel().getColumn(6).setMaxWidth(0);
+				tableMain.getColumnModel().getColumn(4).setHeaderValue("(%) Discount Amount");
+				
+			}else {
+				
+				deductibleTextField.setEnabled(true);
+				
+				tableMain.getColumnModel().getColumn(2).setMaxWidth(2147483647);
+				tableMain.getColumnModel().getColumn(2).setPreferredWidth(columnWidths.get(3));
+				
+				tableMain.getColumnModel().getColumn(3).setMaxWidth(2147483647);
+				tableMain.getColumnModel().getColumn(3).setPreferredWidth(columnWidths.get(3));
+				
+				tableMain.getColumnModel().getColumn(5).setMaxWidth(2147483647);
+				tableMain.getColumnModel().getColumn(5).setPreferredWidth(columnWidths.get(5));
+				
+				tableMain.getColumnModel().getColumn(6).setMaxWidth(2147483647);
+				tableMain.getColumnModel().getColumn(6).setPreferredWidth(columnWidths.get(6));
+				
+				tableMain.getColumnModel().getColumn(4).setHeaderValue("(%) Co-Insurance");
+				
+			}
+			
+			calculateTotal();
+		}
+		
+	}
 
 	private double calculateCoinsurance(Double percent, Double amount){
         return (percent / 100) * amount;
